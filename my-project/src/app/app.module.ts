@@ -10,20 +10,26 @@ import { LoginComponent } from './components/login/login.component';
 import {  FormsModule} from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 
+import { UserService } from "./services/user.service";
+import { ModalComponent } from './modal/modal.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
 @NgModule({
   declarations: [
     AppComponent,
     CrudComponent,
     HomeComponent,
-    LoginComponent
+    LoginComponent,
+    ModalComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgbModule
   ],
-  providers: [],
+  providers: [UserService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

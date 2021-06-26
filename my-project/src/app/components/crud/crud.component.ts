@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from "../../services/user.service";
 import { UserInterface } from "../../models/user-interface";
 import { Router } from '@angular/router';
+import Swal from'sweetalert2';
 
 @Component({
   selector: 'app-crud',
@@ -10,11 +11,13 @@ import { Router } from '@angular/router';
 })
 export class CrudComponent implements OnInit {
 
+  uploadedFiles:Array<File> = [];
   iduser: number = -100;
   name: string = "";
   username: string = "";
   password: string = "";
   confirm_password: string = "";
+  image = "";
   Usuarios: UserInterface[] = [];
 
   constructor(private crudService:UserService, private _router:Router) { }
@@ -32,26 +35,41 @@ export class CrudComponent implements OnInit {
   addUser(){
     for(var a=0; a<this.Usuarios.length; a++){
       if(this.Usuarios[a].username== this.username){
-        console.log('Este usuario ya esta en uso :c')
+        Swal.fire({
+          title: 'Error',
+          text: "Nombre de Usuario ya Exisente",
+          icon: 'warning',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Aceptar'
+        })
         return;
       }
     }
     if((this.password == this.confirm_password) && (this.password!="") && (this.confirm_password!=""))
     {
-      
-      this.crudService.InsertUser(this.name, this.username, this.password)
+      if(this.uploadedFiles!=[]){
+        this.onUpload();
+      }
+      this.crudService.InsertUser(this.name, this.username, this.password, this.image)
       .subscribe((res:UserInterface[]) =>{
         this.Usuarios = res,
         this.name = "",
         this.username = "",
         this.password = "",
-        this.confirm_password = ""
+        this.confirm_password = "",
+        this.image = "";
       })
       console.log("Yes, register")
       this._router.navigate(["/login"]);
     }
     else{
-      console.log("Please enter all fields");
+      Swal.fire({
+        title: 'Error',
+        text: "Las contraseñas no coinciden",
+        icon: 'warning',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Aceptar'
+      })
     }
     
   }
@@ -62,4 +80,20 @@ export class CrudComponent implements OnInit {
     this.password = password;
   }
 
+  abrir(e:any)
+  {
+    this.uploadedFiles = e.target.files;
+    this.image = 'assets/public/' + this.uploadedFiles[0].name
+  }
+  onUpload(){
+    let formData = new FormData();
+    for(let i=0; i<this.uploadedFiles.length; i++){
+      formData.append("uploads[]",this.uploadedFiles[i], this.uploadedFiles[i].name);
+    }
+    // Llamar al Service
+    this.crudService.uploadFile(formData).subscribe((res)=>{
+      console.log('Response: ', res.ruta );
+      this.image = res.ruta;
+    })
+  }
 }
