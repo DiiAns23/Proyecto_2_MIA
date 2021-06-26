@@ -1,0 +1,17 @@
+<!-- Vertically centered modal -->
+<ng-template #contenido let-modal>
+    <div class="modal">
+        <h5 class="modal-title">Publication</h5>
+        <button class="close" aria-label="close" type="button" (click)="modal.dismiss()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Contenido del modal :3
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" type="button" (click)="modal.close()">Ok!</button>
+      </div>
+</ng-template>
+
+<button type="btn btn-outline-danger" (click)="modal.open(contenido)">Lanzar Modal</button>
