@@ -20,11 +20,38 @@ router.get('/getUsers', async (req, res) => {
     res.json(Users);
 })
 
-router.get('/getPublications', async(req,res)=>{
-    sql = "select * from PUBLICATION order by idpublication DESC";
+router.put('/getNoFriends', async(req, res)=>{
+    const{id} = req.body;
+    var ids = id.split(',');
+    sql = "select iduser, name,image from USER_ WHERE "
+    for(var i = 0; i<ids.length; i++){
+        sql += "iduser!="+ ids[i]+" AND "
+    }
+    sql = sql.substring(0,sql.length-4);
+    sql += "order by username";
+    let result = await Proyecto.Open(sql,[],false);
+    Users = [];
+    result.rows.map(user=>{
+        let userSchema = {
+            "id":user[0],
+            "name": user[1],
+        }
+        Users.push(userSchema);
+    })
+    res.json(Users);
+})
+
+router.put('/getPublications', async(req,res)=>{
+    const {id} = req.body;
+    var ids = id.split(',')
+    sql = "select * from PUBLICATION WHERE "
+    for(var i=0; i<ids.length; i++){
+        sql += "iduser="+ ids[i]+" OR "
+    }
+    sql = sql.substring(0,sql.length-3);
+    sql += "order by idpublication DESC";
     let result = await Proyecto.Open(sql,[],false);
     Publications = [];
-
     result.rows.map(publication=>{
         let userSchema = {
             "id":publication[0],
@@ -59,20 +86,22 @@ router.post('/addUser', async (req, res) => {
 //UPDATE
 router.put("/updateUser", async (req, res) => {
     const { 
-        iduser,
-        name,
-        username, 
-        password } = req.body;
+        name_,
+        username_,
+        image_, 
+        password_,
+        usernameantiguo
+    } = req.body;
+    console.log(req.body);
 
-    sql = "update USER_ set name=:name username=:username, password=:password where iduser=:iduser";
+    sql = "update User_ set name=:name_ , username=:username_, image=:image_ where username=:usernameantiguo and password=:password_";
 
-    await Practica1.Open(sql, [ iduser,name, username,password], true);
+    await Proyecto.Open(sql, [ name_, username_,image_,usernameantiguo,password_], true);
 
     res.status(200).json({
-        "codu": codu,
-        "username": username,
-        "firstname": firstname,
-        "lastname": lastname
+        "name": name_,
+        "username": username_,
+        "image": image_,
     })
 
 })
@@ -82,20 +111,20 @@ router.post("/login",async (req,res)=>{
     const{username,password} = req.body;
     sql = "Select iduser,name from USER_ where username=:username AND password=:password";
     sql2 = `
-        DECLARE
-            id_ user_.iduser%TYPE;
-            nombre_ user_.name%TYPE;
-        BEGIN
-            retornar_user(:username,:password,id_,nombre_);
-        END;
+    BEGIN 
+        Login(:username,:password);
+    END;    
     `
-    let result = await Proyecto.Open(sql,[username, password], false);
-    if(result.rows.length > 0) {
+    let result = await Proyecto.Open(sql2,[username, password], false);
+    if(result.implicitResults[0].length > 0) {
         res.status(201).json({
             msg: true,
             DataUser: {
-                "iduser": result.rows[0][0],
-                "name": result.rows[0][1],
+                "iduser": result.implicitResults[0][0][0],
+                "name": result.implicitResults[0][0][1],
+                "username": result.implicitResults[0][0][2],
+                "password": result.implicitResults[0][0][3],
+                "image": result.implicitResults[0][0][4]
             }
         })
     }else{
@@ -107,17 +136,11 @@ router.post("/login",async (req,res)=>{
             }
         })
     }
-    //Aqui me quede hoy 23/06/2021 tengo que ir al Frontend a crear el Login
-
-
-    
-
 })
 
 //NEW POST
 router.post("/newPost", async (req,res)=>{
     const {text, iduser,image} = req.body;
-    console.log(req.body)
     sql= "insert into PUBLICATION(text,iduser,image) values (:text,:iduser,:image)";
     await Proyecto.Open(sql, [text,iduser,image] , true);
     res.status(200).json({
@@ -127,29 +150,46 @@ router.post("/newPost", async (req,res)=>{
     });
 })
 
-//GE FRIENDS
-router.get('/getFriends', async (req, res) => {
-    const {iduser,iduser2} = req.body;
-    sql = "select * from FRIEND WHERE ";
-    let result = await Proyecto.Open(sql, [], false);
+//GET FRIENDS
+router.put('/getFriends', async (req, res) => {
+    const {iduser} = req.body;
+    sql = "select iduser,idfriend1 from FRIEND WHERE iduser = :iduser OR idfriend1 = :iduser";
+    let result = await Proyecto.Open(sql, [iduser], false);
     Users = [];
-
+    Users2 = [];
     result.rows.map(user => {
         let userSchema = {
-            "id": user[0],
-            "name": user[1],
-            "username": user[2],
-            "password": user[3]
+            "id1": user[0],
+            "id2": user[1],
         }  
         Users.push(userSchema);
     })
-    res.json(Users);
+    for(var i=0; i < Users.length; i++){
+        var id = -1;
+        if(Users[i]['id1'] != iduser){
+            id = Users[i]['id1'];
+            sql2 = "select iduser, name  from User_ WHERE iduser = :id"
+        }else{
+            id = Users[i]['id2'];
+            sql2 = "select iduser, name  from User_ WHERE iduser = :id"
+        }
+        let result2 = await Proyecto.Open(sql2,[id], false);
+        result2.rows.map(user=>{
+            let userSchema1={
+            "id": user[0],
+            "name": user[1]
+            }
+            Users2.push(userSchema1)
+        })
+    }
+    res.json(Users2);
 })
-//ADD FRIEND
-router.post("/newPost", async (req,res)=>{
+
+// SET FRIENDLY REQUEST
+router.put('/setFR', async (req,res)=>{
     const {iduser,iduser2} = req.body;
-    console.log(req.body)
-    sql= "insert into FRIEND_REQUEST(iduser,iduser2) values (:iduser,:iduser2)";
+    console.log("Llegamos hasta aqui con los valores:", req.body)
+    sql= "insert into FRIEND_REQUEST(iduser1,iduser2) values (:iduser,:iduser2)";
     await Proyecto.Open(sql, [iduser,iduser2] , true);
     res.status(200).json({
         "iduser": iduser,
@@ -157,23 +197,82 @@ router.post("/newPost", async (req,res)=>{
     });
 })
 
-// //DELETE
-// router.delete("/deleteUser/:codu", async (req, res) => {
-//     const { codu } = req.params;
+router.put('/getFR', async(req,res)=>{
+    const {iduser} = req.body;
+    sql = "select * from FRIEND_REQUEST WHERE iduser2=:iduser";
+    let result = await Proyecto.Open(sql, [iduser], false);
+    Users = [];
+    Users2 = [];
+    result.rows.map(user => {
+        let userSchema = {
+            "iduser": user[1],
+            "iduser2": user[2],
+        }  
+        Users.push(userSchema);
+    })
+    for(var i=0; i < Users.length; i++){
+        var id = -1;
+        if(Users[i]['iduser'] != iduser){
+            id = Users[i]['iduser'];
+            sql2 = "select iduser, name  from User_ WHERE iduser = :id"
+        }else{
+            id = Users[i]['iduser2'];
+            sql2 = "select iduser, name  from User_ WHERE iduser = :id"
+        }
+        let result2 = await Proyecto.Open(sql2,[id], false);
+        result2.rows.map(user=>{
+            let userSchema1={
+            "id": user[0],
+            "name": user[1]
+            }
+            Users2.push(userSchema1)
+        })
+    }
+    res.json(Users2);
+})
 
-//     sql = "update person set state=0 where codu=:codu";
+router.put('/getsetFR', async(req, res)=>{
+    const { iduser } = req.body
+    sql = "select * from Friend_Request where iduser1=: iduser"
+    let result = await Proyecto.Open(sql, [iduser], false);
+    Users = [];
+    result.rows.map(user => {
+        let userSchema = {
+            "iduser": user[1],
+            "iduser2": user[2],
+        }  
+        Users.push(userSchema);
+    })
+    res.json(Users)
+})
 
-//     await Practica1.Open(sql, [codu], true);
+//DELETE FRIEND REQUEST 
 
-//     res.json({ "msg": "Usuario Eliminado" })
-// })
+router.delete("/deleteFR/:iduser1/:iduser2", async (req, res) => {
+    const { iduser1, iduser2 } = req.params;
+    sql = "delete from Friend_Request where iduser1=:iduser1 AND iduser2=:iduser2";
+    await Proyecto.Open(sql, [iduser1, iduser2], true);
+    res.json({ "msg": "Usuario Eliminado" })
+})
 
-// router.get("/", async (req,res) => {
-//     sql = "select * from Practica1";
-//     let result = await Practica1.Open(sql,[], false);
-//     console.log(result);
-//     res.status(200).json({msg:"Todo ok"}); 
-// })
+//ACEPT FRIEND
+
+router.post('/AceptFriend', async(req, res)=>{
+    const { iduser1, iduser2 } = req.body;
+    sql = "insert into Friend(iduser,idfriend1) values(:iduser1, :iduser2)"
+    await Proyecto.Open(sql, [iduser1, iduser2],true);
+    res.status(200).json({
+        "msg": "Nuevo Amigo Agregado :3"
+    });
+})
+
+router.get("/", async (req,res) => {
+    sql = "select * from Practica1";
+    let result = await Practica1.Open(sql,[], false);
+    console.log(result);
+    res.status(200).json({msg:"Todo ok"}); 
+
+})
 
 
 module.exports = router;

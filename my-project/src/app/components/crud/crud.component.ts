@@ -45,27 +45,46 @@ export class CrudComponent implements OnInit {
         return;
       }
     }
-    if((this.password == this.confirm_password) && (this.password!="") && (this.confirm_password!=""))
-    {
-      if(this.uploadedFiles!=[]){
-        this.onUpload();
+    if(this.name!=""){
+      if((this.password == this.confirm_password) && (this.password!="") && (this.confirm_password!=""))
+      {
+        this.crudService.InsertUser(this.name, this.username, this.password, this.image)
+        .subscribe((res:UserInterface[]) =>{
+          this.Usuarios = res,
+          this.name = "",
+          this.username = "",
+          this.password = "",
+          this.confirm_password = "",
+          this.image = "";
+        })
+        Swal.fire({
+          title: 'Succes',
+          text: "Usuario creado correctamente",
+          icon: 'success',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Ok'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            if(this.uploadedFiles!=[]){
+              this.onUpload();
+            }             
+            this._router.navigate(["/login"]);
+          }
+        })
       }
-      this.crudService.InsertUser(this.name, this.username, this.password, this.image)
-      .subscribe((res:UserInterface[]) =>{
-        this.Usuarios = res,
-        this.name = "",
-        this.username = "",
-        this.password = "",
-        this.confirm_password = "",
-        this.image = "";
-      })
-      console.log("Yes, register")
-      this._router.navigate(["/login"]);
-    }
-    else{
+      else{
+        Swal.fire({
+          title: 'Error',
+          text: "Las contraseñas no coinciden",
+          icon: 'warning',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Aceptar'
+        })
+      }
+    }else{
       Swal.fire({
         title: 'Error',
-        text: "Las contraseñas no coinciden",
+        text: "Las por favor ingrese todos los campos",
         icon: 'warning',
         confirmButtonColor: '#3085d6',
         confirmButtonText: 'Aceptar'

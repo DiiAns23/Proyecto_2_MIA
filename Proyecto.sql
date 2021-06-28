@@ -83,49 +83,6 @@ CREATE TABLE Friend_Request (
     FOREIGN KEY (iduser2)
     REFERENCES User_ (iduser));
 
-INSERT INTO USER_(name,username,password,image) VALUES ('Diego Obin','DiiAns23','admin','');
-INSERT INTO USER_(name,username,password,image) VALUES ('Jose Obin','YeNios','admin','');
-INSERT INTO USER_(name,username,password,image) VALUES ('Juan Obin','JcMarro','admin','');
-COMMIT;
-
-INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba',1,'assets/public/WhatsApp Image 2021-04-25 at 8.42.19 PM (1).jpeg');
-INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba numero 2',1,'assets/public/WhatsApp Image 2021-04-25 at 8.42.19 PM (1).jpeg');
-INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba numero 3',1,'assets/public/WhatsApp Image 2021-04-25 at 8.42.19 PM (1).jpeg');
-
-INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba numero 5',1,'assets/public/menor tres.PNG');
-
-
-
-
-CREATE OR REPLACE PROCEDURE buscar_user(username_ in varchar, password_ in varchar) 
-IS
-existe number;
-id_ number;
-nombre_ varchar(20);
-BEGIN
-    existe:=0;
-    SELECT Count(*) into existe 
-    FROM User_
-    WHERE username = username_ AND 
-          password = password_;
-    if existe = 0 then
-        dbms_output.put_line('Este usuario no existe');
-    else
-        SELECT iduser INTO id_
-        FROM User_
-        WHERE username = username_ AND 
-            password = password_;
-        return id_;
-        --dbms_output.put_line('Este usuario se llama: ' || id_);
-    end if;
-END;
-
-
-BEGIN 
-buscar_user('DiiAns23','admin');
-COMMIT;
-END;
-
 CREATE OR REPLACE PROCEDURE insertar_user(name in varchar, username_ in varchar,
 password in varchar, image in varchar)
 IS
@@ -145,41 +102,54 @@ BEGIN
     end if;
 END;
 
-BEGIN
-    insertar_user('Diego Obin','Patron','admin','no-image');
-    COMMIT;
-END;
+CREATE OR REPLACE PROCEDURE Login(
+        usu in User_.username%TYPE,
+        pass in User_.password%TYPE)
+    AS
+        c SYS_REFCURSOR;
+    BEGIN
+        OPEN c for
+        select * from User_ u where (u.username=usu and u.password=pass);
+        dbms_sql.return_result(c);
+    END;
+
+
+INSERT INTO USER_(name,username,password,image) VALUES ('Diego Obin','DiiAns23','admin','');
+INSERT INTO USER_(name,username,password,image) VALUES ('Jose Obin','YeNios','admin','');
+INSERT INTO USER_(name,username,password,image) VALUES ('Juan Obin','JcMarro','admin','');
+INSERT INTO USER_(name,username,password,image) VALUES ('Dominic Obin','Dom','admin','');
+INSERT INTO USER_(name,username,password,image) VALUES ('Jhonn Obin','Jhonn','admin','');
+
+
+INSERT INTO USER_(name,username,password,image) VALUES ('Prueba 1','Admin','admin','');
 
 
 
-CREATE OR REPLACE PROCEDURE retornar_user(username_ in varchar, password_ in varchar,
-id_ out number, name_ out varchar)
-AS
-numero_ number;
-BEGIN 
-    SELECT iduser, name
-    INTO id_, name_
-    FROM User_
-    WHERE 
-        username = username_ and
-        password = password_;
-        dbms_output.put_line('Nombre: '||name_);
-END retornar_user;
+INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba',1,'assets/public/WhatsApp Image 2021-04-25 at 8.42.19 PM (1).jpeg');
+INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba numero 2',1,'assets/public/WhatsApp Image 2021-04-25 at 8.42.19 PM (1).jpeg');
+INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba numero 3',1,'assets/public/WhatsApp Image 2021-04-25 at 8.42.19 PM (1).jpeg');
+INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba numero 5',2,'assets/public/menor tres.PNG');
 
-select status from all_objects where object_name = 'RETORNAR_USER';
+INSERT INTO FRIEND(iduser,idfriend1) VALUES (2,1);
+INSERT INTO FRIEND(iduser,idfriend1) VALUES (1,3);
 
-DECLARE
-    id_ user_.iduser%TYPE;
-    nombre_ user_.name%TYPE;
-BEGIN
-    retornar_user('DiiAns23','hola',id_,nombre_);
-END;
+UPDATE User_ SET username='DiiAns'
+  WHERE username='DiiAns23' ;
 
 
-
-
+COMMIT;
 
 SELECT * FROM User_;
+SELECT * FROM Friend;
+SELECT * FROM Publication;
+SELECT * FROM Friend_Request;
+
+SELECT * FROM FRIEND WHERE iduser = 1 OR idfriend1=1;
+
+SELECT iduser, name FROM USER_ WHERE iduser=21;
+
+
+COMMIT;
 
 
 DROP TABLE Friend_Request;

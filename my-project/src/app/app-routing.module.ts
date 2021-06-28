@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CrudComponent } from "./components/crud/crud.component";
 import { HomeComponent } from "./components/home/home.component";
 import { LoginComponent } from "./components/login/login.component";
+import { UsuarioComponent } from './components/usuario/usuario.component';
 import { AuthGuard } from "./guards/auth.guard";
 import { ModalComponent } from './modal/modal.component';
 
@@ -24,6 +25,11 @@ const routes: Routes = [ //Aqui agregamos las diferenctes rutas para nuestras pa
   {
     path:'modal',
     component:ModalComponent
+  },
+  {
+    path:'home/usuario',
+    component:UsuarioComponent,
+    canActivate:[AuthGuard]
   }
 ];
 

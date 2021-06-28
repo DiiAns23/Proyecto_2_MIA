@@ -36,19 +36,18 @@ export class UserService {
     ).pipe(map(data => data));
   }
   //TO-DO: Update Users
-  UpdateUser(name:string, username:string, password:string){
+  UpdateUser(name:string, username:string, image:string, password:string, usernameantiguo:string){
     const url = 'http://localhost:3000/updateUser';
     return this.http.put<any>(
       url,
         {
-          "name": name,
-          "username":username,
-          "password":password
-        },
-        {
-          headers: this.headers
+          "name_": name,
+          "username_":username,
+          "image_":image,
+          "password_":password,
+          "usernameantiguo": usernameantiguo
         }
-    ).pipe(map(data => data));
+    )
   }
 
   //To-Do: Login
