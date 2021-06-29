@@ -15,9 +15,9 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
   username: string = "";
   password: string = "";
-  Usuarios: UserInterface[] = [];
 
   Login(){
       this.Service.LogIng(this.username, this.password).subscribe((res) =>{

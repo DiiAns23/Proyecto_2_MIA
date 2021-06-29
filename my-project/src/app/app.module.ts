@@ -14,6 +14,7 @@ import { UserService } from "./services/user.service";
 import { ModalComponent } from './modal/modal.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { UsuarioComponent } from './components/usuario/usuario.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { UsuarioComponent } from './components/usuario/usuario.component';
     HomeComponent,
     LoginComponent,
     ModalComponent,
-    UsuarioComponent
+    UsuarioComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,

@@ -67,7 +67,6 @@ export class UserService {
   SetCurrentUser(user:UserInterface){
     let user_string = JSON.stringify(user);
     localStorage.setItem('User_Logged',user_string);
-
   }
   //To-Do Get Current User
   GetCurrentUser(){

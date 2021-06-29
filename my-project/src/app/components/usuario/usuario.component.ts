@@ -36,46 +36,56 @@ export class UsuarioComponent implements OnInit {
     this.username = this.Informacion['username'];
     this.img = this.Informacion['image'];
     this.password = this.Informacion['password'];
-    console.log(this.name, this.username, this.image);
   }
 
   abrir(e:any)
   {
     this.uploadedFiles = e.target.files;
     this.img = 'assets/public/' + this.uploadedFiles[0].name
-    console.log(this.img)
   }
 
   Update(){
     if(this.name!="" && this.username!="" && this.pass!="")
     {
-      console.log("Nombre:", this.name, " Username: ", this.username, " Imagen:", this.img)
-      this.crudService.UpdateUser(this.name,this.username,this.img,this.password, this.Informacion['username']).subscribe((res)=>{
-          let data:UserInterface = {
-            "iduser": this.id,
-            "name": res['name'],
-            "username": res['username'],
-            "image": res['image'],
-            "password": this.password
+        this.crudService.UpdateUser(this.name,this.username,this.img,this.password, this.Informacion['username']).subscribe((res)=>{
+            if(res['name']!="null"){
+              let data:UserInterface = {
+                "iduser": this.id,
+                "name": res['name'],
+                "username": res['username'],
+                "image": res['image'],
+                "password": this.password
+                }
+              this.homeService.LogOut1();
+              this.crudService.SetCurrentUser(data)
+              Swal.fire({
+                title: 'Succes',
+                text: "Datos Actualizados Correctamente",
+                icon: 'success',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Ok'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    if(this.uploadedFiles!=[]){
+                      this.onUpload();
+                    }             
+                    this.router.navigate(["/home"]);
+                  }
+                })
+            }else{
+              Swal.fire({
+                title: 'Error',
+                text: "Contraseña incorrecta :c",
+                icon: 'error',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Ok'
+                }).then((result) => {         
+                  this.router.navigate(["/home/usuario"]);
+                })              
             }
-          this.homeService.LogOut1();
-          this.crudService.SetCurrentUser(data)
 
-        });
-        Swal.fire({
-          title: 'Succes',
-          text: "Datos Actualizados Correctamente",
-          icon: 'success',
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'Ok'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            if(this.uploadedFiles!=[]){
-              this.onUpload();
-            }             
-            this.router.navigate(["/home"]);
-          }
-        })
+          });
+          
     }
   }
 

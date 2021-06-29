@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ChatComponent } from './components/chat/chat.component';
 import { CrudComponent } from "./components/crud/crud.component";
 import { HomeComponent } from "./components/home/home.component";
 import { LoginComponent } from "./components/login/login.component";
@@ -29,6 +30,11 @@ const routes: Routes = [ //Aqui agregamos las diferenctes rutas para nuestras pa
   {
     path:'home/usuario',
     component:UsuarioComponent,
+    canActivate:[AuthGuard]
+  }, 
+  {
+    path:'home/chat',
+    component:ChatComponent,
     canActivate:[AuthGuard]
   }
 ];

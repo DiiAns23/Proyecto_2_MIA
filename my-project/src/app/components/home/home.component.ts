@@ -100,20 +100,22 @@ export class HomeComponent implements OnInit {
 
   onUpload(){
     let formData = new FormData();
-    for(let i=0; i<this.uploadedFiles.length; i++){
-      formData.append("uploads[]",this.uploadedFiles[i], this.uploadedFiles[i].name);
-    }
-    // Llamar al Service
+    formData.append("uploads[]",this.uploadedFiles[0], this.uploadedFiles[0].name);
+      // Llamar al Service
     this.crudService.uploadFile(formData).subscribe((res)=>{
-      console.log('Response: ', res.ruta );
       this.image = res.ruta;
     })
   }
 
   NewPost(){
+    this.crudService.NewPost(this.text,this.iduser,this.image).subscribe((res:Publications[])=>{
+      this.image = "",
+      this.text = ""
+      this.tags = ""
+    });
     if(this.image!=""){
       Swal.fire({
-        title: 'Se ha comparido tu publicacion',
+        title: 'Se ha compartido tu publicacion',
         text: "",
         icon: 'success',
         confirmButtonColor: '#3085d6',
@@ -122,11 +124,6 @@ export class HomeComponent implements OnInit {
       }).then((result) => {
         if (result.isConfirmed) {
           this.onUpload();
-          this.crudService.NewPost(this.text,this.iduser,this.image).subscribe((res:Publications[])=>{
-            this.Publications = res;
-            this.image = "",
-            this.text = ""
-          });
         }
       })
     }else{
@@ -203,6 +200,7 @@ export class HomeComponent implements OnInit {
             })
           })
         })
+        this.idfriend = -1;
       });
       Swal.fire({
         title: 'Nuevo Amigo Agregado',

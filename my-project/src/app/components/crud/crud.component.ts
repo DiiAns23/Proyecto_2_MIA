@@ -27,7 +27,7 @@ export class CrudComponent implements OnInit {
     this.crudService.GetUsers().subscribe((res:UserInterface[]) =>{
       this.Usuarios = res;
       for(var i in this.Usuarios){
-        console.log(this.Usuarios[i].name)
+        console.log(this.Usuarios[i])
       }
     })
   }
@@ -56,7 +56,7 @@ export class CrudComponent implements OnInit {
           this.password = "",
           this.confirm_password = "",
           this.image = "";
-        })
+        });
         Swal.fire({
           title: 'Succes',
           text: "Usuario creado correctamente",
@@ -65,9 +65,7 @@ export class CrudComponent implements OnInit {
           confirmButtonText: 'Ok'
         }).then((result) => {
           if (result.isConfirmed) {
-            if(this.uploadedFiles!=[]){
-              this.onUpload();
-            }             
+            this.onUpload();            
             this._router.navigate(["/login"]);
           }
         })
@@ -104,6 +102,7 @@ export class CrudComponent implements OnInit {
     this.uploadedFiles = e.target.files;
     this.image = 'assets/public/' + this.uploadedFiles[0].name
   }
+
   onUpload(){
     let formData = new FormData();
     for(let i=0; i<this.uploadedFiles.length; i++){
@@ -112,7 +111,6 @@ export class CrudComponent implements OnInit {
     // Llamar al Service
     this.crudService.uploadFile(formData).subscribe((res)=>{
       console.log('Response: ', res.ruta );
-      this.image = res.ruta;
     })
   }
 }

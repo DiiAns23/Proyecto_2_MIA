@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 const Proyecto = require('../config/configdb');
+const sha1 = require('sha1')
 
 //READ
 router.get('/getUsers', async (req, res) => {
@@ -67,18 +68,18 @@ router.put('/getPublications', async(req,res)=>{
 
 router.post('/addUser', async (req, res) => {
     const { name, username, password, image } = req.body;
-
+    const pass = sha1(password);
     sql= `
     BEGIN
-        insertar_user(:name,:username,:password,:image);
+        insertar_user(:name,:username,:pass,:image);
     COMMIT;
     END;`
-    await Proyecto.Open(sql, [name, username, password,image], true);
+    await Proyecto.Open(sql, [name, username, pass,image], true);
 
     res.status(200).json({
         "name": name,
         "username": username,
-        "password": password,
+        "password": pass,
         "image": image
     })
 })
@@ -92,30 +93,48 @@ router.put("/updateUser", async (req, res) => {
         password_,
         usernameantiguo
     } = req.body;
-    console.log(req.body);
-
-    sql = "update User_ set name=:name_ , username=:username_, image=:image_ where username=:usernameantiguo and password=:password_";
-
-    await Proyecto.Open(sql, [ name_, username_,image_,usernameantiguo,password_], true);
-
-    res.status(200).json({
-        "name": name_,
-        "username": username_,
-        "image": image_,
+    const pass = sha1(password_)
+    let userSchema;
+    sql2 = "select * from User_ where username=:username_"
+    result = await Proyecto.Open(sql2, [usernameantiguo], true)
+    result.rows.map(user => {
+        userSchema = {
+            "id": user[0],
+            "name": user[1],
+            "username": user[2],
+            "password": user[3]
+        }  
     })
+
+    if((userSchema['password'])== pass){
+        sql = "update User_ set name=:name_ , username=:username_, image=:image_ where username=:usernameantiguo and password=:pass";
+        await Proyecto.Open(sql, [ name_, username_,image_,usernameantiguo, pass], true);
+        res.status(200).json({
+            "name": name_,
+            "username": username_,
+            "image": image_,
+        })
+    }
+    else{
+        res.status(200).json({
+            "name": "null",
+            "username": "null",
+            "image": "null"
+        })
+    }  
 
 })
 
 //LOGIN 
 router.post("/login",async (req,res)=>{
     const{username,password} = req.body;
-    sql = "Select iduser,name from USER_ where username=:username AND password=:password";
+    const pass = sha1(password);
     sql2 = `
     BEGIN 
-        Login(:username,:password);
+        Login(:username,:pass);
     END;    
     `
-    let result = await Proyecto.Open(sql2,[username, password], false);
+    let result = await Proyecto.Open(sql2,[username, pass], false);
     if(result.implicitResults[0].length > 0) {
         res.status(201).json({
             msg: true,
@@ -188,7 +207,6 @@ router.put('/getFriends', async (req, res) => {
 // SET FRIENDLY REQUEST
 router.put('/setFR', async (req,res)=>{
     const {iduser,iduser2} = req.body;
-    console.log("Llegamos hasta aqui con los valores:", req.body)
     sql= "insert into FRIEND_REQUEST(iduser1,iduser2) values (:iduser,:iduser2)";
     await Proyecto.Open(sql, [iduser,iduser2] , true);
     res.status(200).json({
@@ -267,12 +285,10 @@ router.post('/AceptFriend', async(req, res)=>{
 })
 
 router.get("/", async (req,res) => {
-    sql = "select * from Practica1";
-    let result = await Practica1.Open(sql,[], false);
+    sql = "select * from User_ Proyecto";
+    let result = await Proyecto.Open(sql,[], false);
     console.log(result);
     res.status(200).json({msg:"Todo ok"}); 
 
 })
-
-
 module.exports = router;
