@@ -1,5 +1,5 @@
 export interface UserInterface {
-    id: number,
+    iduser: number,
     name: string,
     username: string,
     image: string,
@@ -10,4 +10,14 @@ export interface Publications {
     text: string,
     idUser:string,
     image:string
+}
+
+export interface Friends{
+    id:number,
+    name: string
+}
+
+export interface GetSetFR{
+    iduser: number,
+    iduser2: number
 }

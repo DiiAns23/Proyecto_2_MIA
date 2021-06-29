@@ -13,6 +13,8 @@ import { HttpClientModule } from "@angular/common/http";
 import { UserService } from "./services/user.service";
 import { ModalComponent } from './modal/modal.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { UsuarioComponent } from './components/usuario/usuario.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +22,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     CrudComponent,
     HomeComponent,
     LoginComponent,
-    ModalComponent
+    ModalComponent,
+    UsuarioComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,
