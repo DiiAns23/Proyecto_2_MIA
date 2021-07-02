@@ -17,19 +17,23 @@ export class HomeComponent implements OnInit {
     public modal:NgbModal, private router:Router) { }
 
   Publications:Publications[] = [];
+  Filter: Publications[] = [];
+  Auxiliar: Publications[] = [];
   Usuarios:Friends[]=[];
   Friend_Request:Friends[]=[];
   GetSetFR: GetSetFR[] = [];
   Amigos: Friends[] = [];
   uploadedFiles:Array<File> = [];
-  text = "";
+  text:string = "";
   iduser = this.crudService.GetCurrentUser()['iduser'];
   name = this.crudService.GetCurrentUser()['name'];
   imageUser = this.crudService.GetCurrentUser()['image'];
-  image = '';
-  tags = "";
-  idfriend = -1;
-  idfriend2 = -1;
+  image:string = '';
+  tags:string = "";
+  tag:string = "";
+  idTotalFriends: string = "";
+  idfriend:number = -1;
+  idfriend2: number= -1;
   SeeButtonFriend = false;
   SeeButtonFriend2 = false;
   SeeButtonFriend3 = false;
@@ -46,6 +50,7 @@ export class HomeComponent implements OnInit {
       ids += this.iduser
       this.homeService.GetPublications(ids).subscribe((res:Publications[]) =>{
         this.Publications = res;
+        this.Auxiliar = this.Publications;
         this.homeService.GetFriendly_Request(this.iduser).subscribe((res:Friends[])=>{   
           this.Friend_Request = res;
           ids += ","
@@ -96,6 +101,7 @@ export class HomeComponent implements OnInit {
     this.uploadedFiles = e.target.files;
     this.image = 'assets/public/' + this.uploadedFiles[0].name
     this.SeeTextTag = true;
+    console.log("Imagen: ", this.image)
   }
 
   onUpload(){
@@ -108,10 +114,7 @@ export class HomeComponent implements OnInit {
   }
 
   NewPost(){
-    this.crudService.NewPost(this.text,this.iduser,this.image).subscribe((res:Publications[])=>{
-      this.image = "",
-      this.text = ""
-      this.tags = ""
+    this.crudService.NewPost(this.text,this.iduser,this.image,this.tags).subscribe((res:Publications[])=>{
     });
     if(this.image!=""){
       Swal.fire({
@@ -145,6 +148,9 @@ export class HomeComponent implements OnInit {
         if(this.Usuarios[i].id==this.idfriend){
           this.Usuarios.splice(i,1)
         }
+      }
+      if(this.Usuarios == []){
+        this.SeeButtonFriend3 = false;
       }
       Swal.fire({
         position: 'top-end',
@@ -213,4 +219,23 @@ export class HomeComponent implements OnInit {
       
     }
   }
+
+  FilterPublic(){
+    if(this.tag!=""){
+      this.Publications = [];
+      this.homeService.FilterPublication(this.tag).subscribe((res:Publications[])=>{
+        this.Filter = res;
+        for(var a = 0; a<this.Auxiliar.length; a++){
+          for(var e = 0; e<this.Filter.length; e++){
+            if(this.Auxiliar[a].id == this.Filter[e]['idUser']){
+              this.Publications.push(this.Auxiliar[a])
+            }
+          }
+        }
+      })
+    }
+    else{
+      this.Publications = this.Auxiliar
+    }
+  } 
 }

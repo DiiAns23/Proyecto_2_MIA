@@ -7,7 +7,7 @@ import { CrudComponent } from './components/crud/crud.component';
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 
-import {  FormsModule} from "@angular/forms";
+import {  FormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 
 import { UserService } from "./services/user.service";

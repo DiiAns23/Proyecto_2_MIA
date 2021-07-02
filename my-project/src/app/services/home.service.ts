@@ -99,4 +99,14 @@ export class HomeService {
       }
     ).pipe(map(data => data));
   }
+
+  FilterPublication(tag: string){
+    const url = 'http://localhost:3000/Filter';
+    return this.http.put<any>(
+      url,
+      {
+        "tag": tag
+      }
+    )
+  }
 }

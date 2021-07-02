@@ -84,7 +84,7 @@ export class UserService {
     return this.http.post<any>(url, formData);
   }
   //To-Do New Post
-  NewPost(text:string, iduser: number,image:string)
+  NewPost(text:string, iduser: number,image:string,tag:string)
   {
     const url = 'http://localhost:3000/newPost';
     return this.http.post<any>(
@@ -92,7 +92,8 @@ export class UserService {
       {
         "text": text,
         "iduser":iduser,
-        "image": image
+        "image": image,
+        "tag": tag
       }
     ).pipe(map(data => data));
   }

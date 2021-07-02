@@ -47,7 +47,7 @@ export class UsuarioComponent implements OnInit {
   Update(){
     if(this.name!="" && this.username!="" && this.pass!="")
     {
-        this.crudService.UpdateUser(this.name,this.username,this.img,this.password, this.Informacion['username']).subscribe((res)=>{
+        this.crudService.UpdateUser(this.name,this.username,this.img,this.pass, this.Informacion['username']).subscribe((res)=>{
             if(res['name']!="null"){
               let data:UserInterface = {
                 "iduser": this.id,
@@ -86,6 +86,16 @@ export class UsuarioComponent implements OnInit {
 
           });
           
+    }else{
+      Swal.fire({
+        title: 'Error',
+        text: "Por favor llena todos los campos",
+        icon: 'error',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Ok'
+        }).then((result) => {         
+          this.router.navigate(["/home/usuario"]);
+        })
     }
   }
 

@@ -24,10 +24,11 @@ export class CrudComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.crudService.GetUsers().subscribe((res:UserInterface[]) =>{
-      this.Usuarios = res;
+    this.crudService.GetUsers().subscribe((res) =>{
+      //this.Usuarios = res;
+      console.log(res[0].username)
       for(var i in this.Usuarios){
-        console.log(this.Usuarios[i])
+        console.log(this.Usuarios[i].username)
       }
     })
   }
