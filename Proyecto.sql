@@ -83,6 +83,7 @@ CREATE TABLE Friend_Request (
     FOREIGN KEY (iduser2)
     REFERENCES User_ (iduser));
 
+
 CREATE OR REPLACE PROCEDURE insertar_user(name in varchar, username_ in varchar,
 password in varchar, image in varchar)
 IS
@@ -102,6 +103,7 @@ BEGIN
     end if;
 END;
 
+
 CREATE OR REPLACE PROCEDURE Login(
         usu in User_.username%TYPE,
         pass in User_.password%TYPE)
@@ -114,42 +116,14 @@ CREATE OR REPLACE PROCEDURE Login(
     END;
 
 
-INSERT INTO USER_(name,username,password,image) VALUES ('Diego Obin','DiiAns23','admin','');
-INSERT INTO USER_(name,username,password,image) VALUES ('Jose Obin','YeNios','admin','');
-INSERT INTO USER_(name,username,password,image) VALUES ('Juan Obin','JcMarro','admin','');
-INSERT INTO USER_(name,username,password,image) VALUES ('Dominic Obin','Dom','admin','');
-INSERT INTO USER_(name,username,password,image) VALUES ('Jhonn Obin','Jhonn','admin','');
-
-
-INSERT INTO USER_(name,username,password,image) VALUES ('Prueba 1','Admin','admin','');
-
-
-
-INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba',1,'assets/public/WhatsApp Image 2021-04-25 at 8.42.19 PM (1).jpeg');
-INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba numero 2',1,'assets/public/WhatsApp Image 2021-04-25 at 8.42.19 PM (1).jpeg');
-INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba numero 3',1,'assets/public/WhatsApp Image 2021-04-25 at 8.42.19 PM (1).jpeg');
-INSERT INTO PUBLICATION(text,iduser,image) VALUES ('Nueva publicacion de prueba numero 5',2,'assets/public/menor tres.PNG');
-
-INSERT INTO FRIEND(iduser,idfriend1) VALUES (2,1);
-INSERT INTO FRIEND(iduser,idfriend1) VALUES (1,3);
-
-UPDATE User_ SET username='DiiAns'
-  WHERE username='DiiAns23' ;
-
-
 COMMIT;
 
 SELECT * FROM User_;
 SELECT * FROM Friend;
 SELECT * FROM Publication;
+SELECT * FROM Tags;
 SELECT * FROM Friend_Request;
 
-SELECT * FROM FRIEND WHERE iduser = 1 OR idfriend1=1;
-
-SELECT iduser, name FROM USER_ WHERE iduser=21;
-
-
-COMMIT;
 
 
 DROP TABLE Friend_Request;

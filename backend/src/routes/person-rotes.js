@@ -4,6 +4,7 @@ const Proyecto = require('../config/configdb');
 const sha1 = require('sha1')
 
 //READ
+
 router.get('/getUsers', async (req, res) => {
     sql = "select * from USER_";
     let result = await Proyecto.Open(sql, [], false);
@@ -20,6 +21,8 @@ router.get('/getUsers', async (req, res) => {
     })
     res.json(Users);
 })
+
+// GET NO FRIENDS
 
 router.put('/getNoFriends', async(req, res)=>{
     const{id} = req.body;
@@ -41,6 +44,8 @@ router.put('/getNoFriends', async(req, res)=>{
     })
     res.json(Users);
 })
+
+// GET PUBLICATIONS
 
 router.put('/getPublications', async(req,res)=>{
     const {id} = req.body;
@@ -64,7 +69,8 @@ router.put('/getPublications', async(req,res)=>{
     })
     res.json(Publications);
 })
-//CREATE
+
+//CREATE NEW USER
 
 router.post('/addUser', async (req, res) => {
     const { name, username, password, image } = req.body;
@@ -84,7 +90,8 @@ router.post('/addUser', async (req, res) => {
     })
 })
 
-//UPDATE
+//UPDATE USER
+
 router.put("/updateUser", async (req, res) => {
     const { 
         name_,
@@ -93,6 +100,7 @@ router.put("/updateUser", async (req, res) => {
         password_,
         usernameantiguo
     } = req.body;
+    console.log("Password enviada sin encriptar: ", password_)
     const pass = sha1(password_)
     let userSchema;
     sql2 = "select * from User_ where username=:username_"
@@ -105,7 +113,8 @@ router.put("/updateUser", async (req, res) => {
             "password": user[3]
         }  
     })
-
+    console.log(userSchema['password']," Esta seria la que esta en la base de datos")
+    console.log(pass, "Esta es la que yo estoy mandando :c ")
     if((userSchema['password'])== pass){
         sql = "update User_ set name=:name_ , username=:username_, image=:image_ where username=:usernameantiguo and password=:pass";
         await Proyecto.Open(sql, [ name_, username_,image_,usernameantiguo, pass], true);
@@ -126,6 +135,7 @@ router.put("/updateUser", async (req, res) => {
 })
 
 //LOGIN 
+
 router.post("/login",async (req,res)=>{
     const{username,password} = req.body;
     const pass = sha1(password);
@@ -158,10 +168,29 @@ router.post("/login",async (req,res)=>{
 })
 
 //NEW POST
+
 router.post("/newPost", async (req,res)=>{
-    const {text, iduser,image} = req.body;
+    const {text, iduser,image, tag} = req.body;
     sql= "insert into PUBLICATION(text,iduser,image) values (:text,:iduser,:image)";
-    await Proyecto.Open(sql, [text,iduser,image] , true);
+    sql2 = "select idpublication from PUBLICATION WHERE text =:text AND iduser=:iduser AND image=:image";
+    sql3 = "insert into TAGS(tag, idpublication) values(:tg,:idpublication)";
+    console.log(req.body," Estos datos llegaron a la Api")
+    var tags = tag.split("#")
+    console.log("Variabla ya spliteada:",tags)
+    await Proyecto.Open(sql, [text,iduser,image] , true); //insert publication
+    let result = await Proyecto.Open(sql2,[text,iduser,image], true); //obtener el id de la publicacion
+    let idpublication = -1;
+    result.rows.map(id=>{
+        idpublication = id[0]
+    })
+    console.log("Antes de entrar para hacer el #tag de la publicacion:")
+    if(tags!=[] && idpublication!=-1){
+        for(var a = 1; a<tags.length; a++){
+            var tg = tags[a]
+            console.log("Se enviaron estos datos: tag:", tg, " idpublicacion: ",idpublication)
+            await Proyecto.Open(sql3, [ tg , idpublication] , true); //insert tag
+        }
+    }   
     res.status(200).json({
         "text": text,
         "iduser": iduser,
@@ -170,6 +199,7 @@ router.post("/newPost", async (req,res)=>{
 })
 
 //GET FRIENDS
+
 router.put('/getFriends', async (req, res) => {
     const {iduser} = req.body;
     sql = "select iduser,idfriend1 from FRIEND WHERE iduser = :iduser OR idfriend1 = :iduser";
@@ -205,6 +235,7 @@ router.put('/getFriends', async (req, res) => {
 })
 
 // SET FRIENDLY REQUEST
+
 router.put('/setFR', async (req,res)=>{
     const {iduser,iduser2} = req.body;
     sql= "insert into FRIEND_REQUEST(iduser1,iduser2) values (:iduser,:iduser2)";
@@ -214,6 +245,8 @@ router.put('/setFR', async (req,res)=>{
         "iduser2": iduser2
     });
 })
+
+// GET FRIENDLY REQUEST
 
 router.put('/getFR', async(req,res)=>{
     const {iduser} = req.body;
@@ -249,6 +282,8 @@ router.put('/getFR', async(req,res)=>{
     res.json(Users2);
 })
 
+// GET SET FRIENDLY REQUEST
+
 router.put('/getsetFR', async(req, res)=>{
     const { iduser } = req.body
     sql = "select * from Friend_Request where iduser1=: iduser"
@@ -282,6 +317,26 @@ router.post('/AceptFriend', async(req, res)=>{
     res.status(200).json({
         "msg": "Nuevo Amigo Agregado :3"
     });
+})
+
+// FILTER PUBLICATION
+
+router.put('/Filter', async(req,res)=>{
+    const { tag } = req.body;
+    var aux  = tag;
+    sql = "select * from TAGS where tag=:aux"
+    let result = await Proyecto.Open(sql,[aux],false);
+    Filter = [];
+    result.rows.map(filt =>{
+        let filtt = {
+            "id": filt[0],
+            "text": filt[1],
+            "idUser": filt[2]
+        }
+        Filter.push(filtt)
+    })
+    res.json(Filter)
+
 })
 
 router.get("/", async (req,res) => {
