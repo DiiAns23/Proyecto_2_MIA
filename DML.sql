@@ -83,7 +83,9 @@ CREATE TABLE Friend_Request (
     FOREIGN KEY (iduser2)
     REFERENCES User_ (iduser));
 
-
+-- -----------------------------------------------------
+-- Procedure New User
+-- -----------------------------------------------------
 CREATE OR REPLACE PROCEDURE insertar_user(name in varchar, username_ in varchar,
 password in varchar, image in varchar)
 IS
@@ -103,7 +105,9 @@ BEGIN
     end if;
 END;
 
-
+-- -----------------------------------------------------
+-- Procedure Login
+-- -----------------------------------------------------
 CREATE OR REPLACE PROCEDURE Login(
         usu in User_.username%TYPE,
         pass in User_.password%TYPE)
@@ -115,29 +119,4 @@ CREATE OR REPLACE PROCEDURE Login(
         dbms_sql.return_result(c);
     END;
 
-
 COMMIT;
-
-SELECT * FROM User_;
-SELECT * FROM Friend;
-SELECT * FROM Publication;
-SELECT * FROM Tags;
-SELECT * FROM Friend_Request;
-
-
-
-DROP TABLE Friend_Request;
-DROP TABLE Message;
-DROP TABLE Tags;
-DROP TABLE Publication;
-DROP TABLE Friend;
-DROP TABLE User_;
-
-COMMIT;
-
-
-
-
-
-
-
