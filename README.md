@@ -6,6 +6,7 @@ DOCUMENTACION 📑
 - [Grafo Entidad-Relacion](#enti)
 - [Endpoints](#end)
 - [Stored Procedure](#estpro)
+- [Version de Oracle](#oracle)
 - [FAQ](#questions)
 
 <div id='introduccion'/>
@@ -20,14 +21,14 @@ Con la finalidad de la implementacion de `Bases de Datos` asi como `NodeJS` y `A
 
 La `Arquitectura Implementada` de dicho proyecto fue de la siguiente manera:
 
-![](https://github.com/DiiAns23/Prueba-2/blob/Master/Typesty.PNG)
+![](https://github.com/DiiAns23/Prueba-2/blob/Master/Arquitectura.PNG)
 
 
 <div id='enti'/>
 
 ## Grafo Entidad-Relacion 📊
 
-![](https://github.com/DiiAns23/Prueba-2/blob/Master/Typesty.PNG)
+![](https://github.com/DiiAns23/Prueba-2/blob/Master/Entidad-Relacion.png)
 
 
 
@@ -413,35 +414,76 @@ router.put('/Filter', async(req,res)=>{
 
 ## Stored Procedure
 
-**Hola**
+ - **Insertar Usuario:**
+ Para la creacion de un nuevo usuario se realizó un Stored Procedure en el que se debe de ingresar el nombre, usuario contraseña y una imagen.
+```sql
+CREATE OR REPLACE PROCEDURE insertar_user(name in varchar, username_ in varchar,
+password in varchar, image in varchar)
+IS
+existe number;
+BEGIN
+    existe:=0;
+    SELECT Count(*) into existe 
+    FROM User_
+    WHERE username = username_;
+    
+    if existe = 0 then
+        insert into User_(name,username, password, image) values(name, username_, password, image);
+        dbms_output.put_line('Usuario registrado con exito: ' || username_);
+    else
+        existe := -1;
+        dbms_output.put_line('No registrado error: ' || existe);
+    end if;
+END;
+```
+ - **Logueo de Usuario:**
+El Stored Procedure para el logueo de un usuario, solicita el usuario y contraseña del mismo, de no existir en la base de datos no devolverá ningún valor.
+```sql
+CREATE OR REPLACE PROCEDURE Login(
+        usu in User_.username%TYPE,
+        pass in User_.password%TYPE)
+    AS
+        c SYS_REFCURSOR;
+    BEGIN
+        OPEN c for
+        select * from User_ u where (u.username=usu and u.password=pass);
+        dbms_sql.return_result(c);
+    END;
+```
+
+<div id='oracle'/>
+
+## Versión De Oracle Utilizada
+
+![](https://github.com/DiiAns23/Prueba-2/blob/Master/Oracle-Version.PNG)
+
 
 <div id='questions'/> 
 
-
-
 ## Preguntas Frecuentes (FAQ) ❓
-**1. ¿Se puede cargar un archivo que sea otro tipo de extensión?** 
+**1. ¿Me puedo loguear dos veces?** 
 
-> _R//_ *No, el programa admite solo extensiones olc*
+> _R//_ *Si, siempre y cuando el nombre de usuario (username) no sea el mismo*
 
-**2. ¿Puedo correr el .py desde otro dispositivo?** 
+**2. ¿Se puede visualizar mi constraseña en la base de datos?** 
 
-> _R//_ *Sí, solo si tu ordenador debe contar con Node y Angular*
+> _R//_ *No, debido a que tu contraseña se almacena de una forma encriptada*
 
-**3. ¿Cuántos archivos puedo ingresar?** 
+**3. ¿Cuántos amigos puedo tener?** 
 
-> _R//_ *El programa no tiene un límite para el ingreso de arcchivos*
+> _R//_ *La aplicación no tiene un límite de amigos*
 
-**4.¿En donde se almacenan los archivos guardados?** 
+**4.¿En donde se almacenan mis datos?** 
 
-> _R//_ *El programa deberá preguntar/indicar el lugar en el cual deseas almacenar tu código*
+> _R//_ *Se almacenan en un servidor local en una base de datos*
 
-**5. ¿Por qué no me imprime nada mi código?** 
+**5. ¿Cuántas publicaciones puedo realizar?** 
 
-> _R//_ *Suele suceder porque el código no cuenta con la estructura correspondiente.*
+> _R//_ *No existe un límite de publicaciones por usuario*
 
-```java
+```js
 Universidad San Carlos de Guatemala 2021
 Programador: Diego Andrés Obín Rosales
-
-Carné: 201903865
+Carne: 201903865
+Correo: diego.obin23@gmail.com
+```
