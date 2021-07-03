@@ -455,7 +455,7 @@ CREATE OR REPLACE PROCEDURE Login(
 
 ## Versión De Oracle Utilizada
 
-![](https://github.com/DiiAns23/Prueba-2/blob/Master/Oracle-Version.PNG)
+![](https://github.com/DiiAns23/Prueba-2/blob/Master/Oracle-V.PNG)
 
 
 <div id='questions'/> 
